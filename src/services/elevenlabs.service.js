@@ -28,14 +28,13 @@ Be professional but friendly in your interactions.`;
         `${this.baseURL}/convai/agents/create`,
         {
           conversation_config: {
-            name: "React Technical Interviewer",
-            description: "An AI agent that conducts React.js technical interviews",
-            system_prompt: this.systemPrompt,
-            initial_message: "Hello! I'll be conducting your React.js technical interview today. Are you ready to begin?",
-            language: "en"
-          },
-          platform_settings: {
-            enable_conversation_history: true
+            agent: {
+              first_message: "Hello! I'll be conducting your React.js technical interview today. Are you ready to begin?",
+              language: "en",
+              prompt: {
+                prompt: this.systemPrompt
+              }
+            }
           },
           name: "React Technical Interviewer",
           tags: ["react", "technical-interview"]
