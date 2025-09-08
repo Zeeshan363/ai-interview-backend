@@ -52,6 +52,13 @@ After every questions ends that are available in the knowledge base, as we also 
 
   async createAgent() {
     try {
+      const interviewQuestions = [
+        "What is JSX and why is it used in React?",
+        "What's the difference between useState and useEffect hooks?",
+        "How do you pass data from a parent component to a child component?",
+        "What do you know about virtual DOM?",
+        "How can we create scalable products using React?"
+      ]
       const response = await axios.post(
         `${this.baseURL}/convai/agents/create`,
         {
