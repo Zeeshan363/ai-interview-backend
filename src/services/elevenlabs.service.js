@@ -4,8 +4,7 @@ class ElevenLabsService {
   constructor() {
     this.apiKey = process.env.ELEVENLABS_API_KEY;
     this.baseURL = 'https://api.elevenlabs.io/v1';
-    this.systemPrompt = `
-      You are an experienced interviewer conducting interviews. Your role is to ask questions from the knowledge base file "Interview Questions" and evaluate candidate responses.
+    this.systemPrompt = `You are an experienced interviewer conducting interviews. Your role is to ask questions from the knowledge base file "Interview Questions" and evaluate candidate responses.
 Core Instructions:
 Question Management:
 
@@ -52,13 +51,9 @@ After every questions ends that are available in the knowledge base, as we also 
 
   async createAgent() {
     try {
-      const interviewQuestions = [
-        "What is JSX and why is it used in React?",
-        "What's the difference between useState and useEffect hooks?",
-        "How do you pass data from a parent component to a child component?",
-        "What do you know about virtual DOM?",
-        "How can we create scalable products using React?"
-      ]
+      // First create the knowledge base
+      const knowledgeBase = await this.createKnowledgeBase();
+      
       const response = await axios.post(
         `${this.baseURL}/convai/agents/create`,
         {
@@ -68,7 +63,13 @@ After every questions ends that are available in the knowledge base, as we also 
               language: "en",
               prompt: {
                 prompt: this.systemPrompt
+              },
+              voice: {
+                voice_id: "TbMNBJ27fH2U0VgpSNko" // Lori's voice ID
               }
+            },
+            knowledge_base: {
+              documents: [knowledgeBase.id]
             }
           },
           name: "AI Interviewer",
@@ -86,6 +87,40 @@ After every questions ends that are available in the knowledge base, as we also 
     } catch (error) {
       console.error('Error creating ElevenLabs agent:', error.response?.data || error.message);
       throw new Error('Failed to create interview agent');
+    }
+  }
+
+  async createKnowledgeBase() {
+    try {
+      const interviewQuestions = [
+        "What is JSX and why is it used in React?",
+        "What's the difference between useState and useEffect hooks?",
+        "How do you pass data from a parent component to a child component?",
+        "What do you know about virtual DOM?",
+        "How can we create scalable products using React?"
+      ];
+
+      // Convert questions array to text format
+      const questionsText = interviewQuestions.map((q, i) => `Question ${i + 1}: ${q}`).join('\n\n');
+
+      const response = await axios.post(
+        `${this.baseURL}/convai/knowledge-base/text`,
+        {
+          text: questionsText,
+          name: "Interview Questions"
+        },
+        {
+          headers: {
+            'xi-api-key': this.apiKey,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Error creating knowledge base:', error.response?.data || error.message);
+      throw new Error('Failed to create knowledge base');
     }
   }
 
